@@ -7,8 +7,10 @@ error_reporting(E_ALL);
 
 session_start();
 //var_dump($_SESSION);
+
+//If user is not logged in
 if (!isset($_SESSION['un'])) {
-    $_SESSION['page'] = 'index.php';
+    $_SESSION['page'] = 'page1.php';
     header('location: login.php');
 }
 ?>
@@ -27,8 +29,8 @@ if (!isset($_SESSION['un'])) {
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Super Secret</a>
             <ul class="nav navbar-nav">
-                <li class="active"><a href="index.php">Home</a></li>
-                <li><a href="page1.php">Page 1</a></li>
+                <li><a href="index.php">Home</a></li>
+                <li class="active"><a href="page1.php">Page 1</a></li>
                 <li><a href="page2.php">Page 2</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
@@ -37,7 +39,7 @@ if (!isset($_SESSION['un'])) {
         </div>
     </nav>
 
-    <h1>Admin Page</h1>
+    <h1>Page 1</h1>
     <p>This page contains super-sensitive data</p>
 </div>
 

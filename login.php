@@ -1,11 +1,28 @@
 <?php
     // 328/login/login.php
 
+    /*
+     * DROP TABLE users;
+        CREATE TABLE users (
+            userid int(5) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+            username varchar(20) NOT NULL,
+            password varchar(40) NOT NULL,
+            authlevel int(1) DEFAULT NULL
+        );
+
+        INSERT INTO users (username, password, authlevel) VALUES
+             ('jshmo', sha1('shmo123'), 1),
+             ('jdoe', sha1('doe456'), 2);
+     */
+
     //Turn on error reporting
     ini_set('display_errors', 1);
     error_reporting(E_ALL);
 
     session_start();
+
+    //See where the user came from
+    //echo $_SERVER['HTTP_REFERER'];
 
     //Check login
     /*
@@ -20,13 +37,43 @@
     //See if the login form has been submitted
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-        if ($_POST['username'] == 'jshmo' && $_POST['password'] == 'shmo123') {
+        //Connect to DB
+        require $_SERVER['DOCUMENT_ROOT']."/../config.php";
+        //require "/home/tostrand/config.php";
+        // /home/tostrand/public_html
+        // /home/tostrand/config.php
+
+        //Query the DB
+        $sql = "SELECT * FROM users WHERE username = :un AND password = :pw";
+        $sql2 = "INSERT INTO users (username, password, authlevel) 
+                VALUES (:username, :password, :authlevel)";
+        $statement = $dbh->prepare($sql);
+
+        $un = $_POST['username'];
+        $pw = sha1($_POST['password']);
+        $statement->bindParam(':un', $un, PDO::PARAM_STR);
+        $statement->bindParam(':pw', $pw, PDO::PARAM_STR);
+        $statement->execute();
+        $count = $statement->rowCount();
+        $row = $statement->fetch(PDO::FETCH_ASSOC);
+        $authLevel = $row['authlevel'];
+
+        //Successful login
+        if ($count == 1) {
 
             //$user = new User(...);
             //$_SESSION['un'] = $user;
 
-            $_SESSION['un'] = $_POST['username'];
-            header('location: index.php');
+            $_SESSION['un'] = $un;
+
+            //Send the user back where they came from
+            if (isset($_SESSION['page'])) {
+                $loc = $_SESSION['page'];
+            } else {
+                $loc = "index.php";
+            }
+            header("location: $loc");
+
         } else {
             //Set error flag
             $errFlag = true;
